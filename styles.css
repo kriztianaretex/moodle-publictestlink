@@ -1,0 +1,14 @@
+/* Hide top navbar (primary navigation) */
+body.landing-body nav.navbar {
+    display: none !important;
+}
+
+/* Remove extra top spacing left by navbar */
+body.landing-body #page {
+    margin-top: 0;
+}
+
+/* Optional: hide edit mode / icons row spacing */
+body.landing-body .secondary-navigation {
+    display: none;
+}
