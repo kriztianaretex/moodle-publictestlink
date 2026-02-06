@@ -22,10 +22,10 @@ $PAGE->add_body_class('landing-body');
 $form = new local_publictestlink_non_user_login();
 
 if ($data = $form->get_data()) {
-    echo $OUTPUT->notification('Form submitted successfully!', 'notifysuccess');
-    exit;
+    var_dump($data->firstname);
+    var_dump($data->lastname);
+    var_dump($data->email);
 }
-
 
 echo $OUTPUT->header();
 $form->display();
