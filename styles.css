@@ -12,3 +12,7 @@ body.landing-body #page {
 body.landing-body .secondary-navigation {
     display: none;
 }
+
+body.landing-body .mform input {
+    width: 100%;
+}
