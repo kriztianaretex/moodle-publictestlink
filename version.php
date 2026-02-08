@@ -24,8 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2026020500;
-$plugin->requires = 2022041900;
+$plugin->component = 'local_publictestlink';
+$plugin->version   = 2026020601;
+$plugin->requires  = 2022041900; 
 $plugin->supported = [500, 511];   // Available as of Moodle 3.9.0 or later.
 // $plugin->incompatible = [400, 404];   // Available as of Moodle 3.9.0 or later.
 $plugin->component = 'local_publictestlink';
