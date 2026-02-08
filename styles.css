@@ -1,0 +1,19 @@
+body.landing-body nav.navbar {
+    display: none !important;
+}
+
+body.landing-body .footer-popover {
+    display: none !important;
+}
+
+body.landing-body #page {
+    margin-top: 0;
+}
+
+body.landing-body .secondary-navigation {
+    display: none;
+}
+
+body.landing-body .mform input {
+    width: 100%;
+}
