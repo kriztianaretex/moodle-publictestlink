@@ -1,16 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/publictestlink/db" VERSION="2026020600" COMMENT="Your plugin tables">
-    <TABLES>
-        <TABLE NAME="local_publictestlink_quizcustom" COMMENT="Per-quiz settings">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true"/>
-                <FIELD NAME="enablepublicquiz" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="quizid_uq" TYPE="unique" FIELDS="quizid"/>
-            </KEYS>
-        </TABLE>
-    </TABLES>
+<XMLDB PATH="local/publictestlink/db" VERSION="20260209" COMMENT="Your plugin tables"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_publictestlink_quizcustom" COMMENT="Per-quiz settings">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="enablepublicquiz" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="quizid_fk" TYPE="foreign" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_publictestlink_shadowuser" COMMENT="All shadow users">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="email" TYPE="char" LENGTH="200" NOTNULL="true" SEQUENCE="false" COMMENT="The email of the user."/>
+        <FIELD NAME="firstname" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="First name of the user."/>
+        <FIELD NAME="lastname" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Last name of the user."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time created"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="email_uq" TYPE="unique" FIELDS="email" COMMENT="Email unique."/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_publictestlink_quizattempt" COMMENT="Represents a public quiz attempt.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="shadowuserid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Shadow user ID."/>
+        <FIELD NAME="questionusageid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Question Usage ID."/>
+        <FIELD NAME="quizid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The quiz ID."/>
+        <FIELD NAME="state" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="State of the attempt."/>
+        <FIELD NAME="timestart" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Attempt start time."/>
+        <FIELD NAME="timeend" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="End time of the attempt."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="shadowuserid_fk" TYPE="foreign" FIELDS="shadowuserid" REFTABLE="local_publictestlink_shadowuser" REFFIELDS="id" COMMENT="Foreign key for shadow user ID."/>
+        <KEY NAME="questionusageid_fk" TYPE="foreign" FIELDS="questionusageid" REFTABLE="question_usages" REFFIELDS="id" COMMENT="Foreign key for questionusageid."/>
+        <KEY NAME="quizid_fk" TYPE="foreign" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id" COMMENT="Foreign key for quiz ID."/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
 </XMLDB>

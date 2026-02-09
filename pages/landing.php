@@ -1,13 +1,26 @@
 <?php
 
 require_once('../../config.php');
-// $cmid = required_param('id', PARAM_INT);
-// $cm = get_coursemodule_from_id('mymodulename', $cmid, 0, false, MUST_EXIST);
-// $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-
-// require_login($course, true, $cm);
 
 require_once('./forms/non_user_login.php');
+require_once($GLOBALS['CFG']->libdir . '/moodlelib.php');
+
+
+// function normalize_email(string $email): string {
+//     return core_text::strtolower(trim($email));
+// }
+
+// function login_shadow_user(string $email, string $firstname, string $lastname): bool {
+//     $email = normalize_email($email);
+//     $firstname = trim($firstname);
+//     $lastname  = trim($lastname);
+
+//     if (empty($email)) {
+//         throw new \core\exception\moodle_exception('invalidemail');
+//     }
+
+// }
+
 $PAGE->requires->css('/local/publictestlink/styles.css');
 
 $PAGE->set_url('/local/publictestlink/landing.php');
