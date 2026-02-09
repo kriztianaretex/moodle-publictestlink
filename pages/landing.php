@@ -1,8 +1,8 @@
 <?php
 
-require_once('../../config.php');
+require_once('../../../config.php');
 
-require_once('./forms/non_user_login.php');
+require_once('../forms/non_user_login.php');
 require_once($GLOBALS['CFG']->libdir . '/moodlelib.php');
 
 
@@ -23,7 +23,7 @@ require_once($GLOBALS['CFG']->libdir . '/moodlelib.php');
 
 $PAGE->requires->css('/local/publictestlink/styles.css');
 
-$PAGE->set_url('/local/publictestlink/landing.php');
+$PAGE->set_url('/local/publictestlink/pages/landing.php');
 $PAGE->set_context(context_system::instance());
 
 $PAGE->set_title('Login');
@@ -35,9 +35,17 @@ $PAGE->add_body_class('landing-body');
 $form = new local_publictestlink_non_user_login();
 
 if ($data = $form->get_data()) {
-    var_dump($data->firstname);
-    var_dump($data->lastname);
-    var_dump($data->email);
+    $user = (object)[
+        'email' => $data->email,
+        'firstname' => $data->firstname,
+        'lastname' => $data->lastname,
+        'timecreated' => time()
+    ];
+
+    $userid = $DB->insert_record(
+        'local_publictestlink_shadowuser',
+        $user
+    );
 }
 
 echo $OUTPUT->header();

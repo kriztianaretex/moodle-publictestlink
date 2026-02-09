@@ -31,5 +31,5 @@ foreach ($quizobj->get_structure()->get_slots() as $slot) {
 }
 
 $quba->start_all_questions();
-
 question_engine::save_questions_usage_by_activity($quba);
+
