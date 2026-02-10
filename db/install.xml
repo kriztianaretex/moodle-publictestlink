@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/publictestlink/db" VERSION="2026020600" COMMENT="Your plugin tables">
-    <TABLES>
-        <TABLE NAME="local_publictestlink_quizcustom" COMMENT="Per-quiz settings">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true"/>
-                <FIELD NAME="enablepublicquiz" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="quizid_uq" TYPE="unique" FIELDS="quizid"/>
-            </KEYS>
-        </TABLE>
-    </TABLES>
+<XMLDB PATH="local/publictestlink/db" VERSION="2024111400" COMMENT="Public Test Link Plugin">
+  <TABLES>
+    <TABLE NAME="local_publictestlink" COMMENT="Stores public access information for quizzes">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="ispublic" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" COMMENT="Whether the quiz is public (0=private, 1=public)"/>
+        <FIELD NAME="hash" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Unique hash for public access URL"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="uq_quizid" TYPE="unique" FIELDS="quizid"/>
+        <KEY NAME="uq_hash" TYPE="unique" FIELDS="hash"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_ispublic" UNIQUE="false" FIELDS="ispublic"/>
+        <INDEX NAME="idx_quizid_ispublic" UNIQUE="false" FIELDS="quizid, ispublic"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
 </XMLDB>
