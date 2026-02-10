@@ -53,7 +53,6 @@ if ($isfinish) {
     );
 }
 
-// Otherwise: just saved answers
 redirect(
     new moodle_url($PLUGIN_URL . '/attempt.php', [
         'attemptid' => $attemptid,
