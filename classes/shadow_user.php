@@ -86,4 +86,21 @@ class publictestlink_shadow_user {
     public function get_lastname(): string {
         return $this->lastname;
     }
+
+    public function update_names(string $firstname, string $lastname) {
+        global $DB;
+        /** @var moodle_database $DB */
+
+        $firstname = clean_name($firstname);
+        $lastname = clean_name($lastname);
+
+        $DB->update_record('local_publictestlink_shadowuser', [
+            'id' => $this->id,
+            'firstname' => $this->firstname,
+            'lastname' => $this->lastname,
+        ]);
+
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+    }
 }

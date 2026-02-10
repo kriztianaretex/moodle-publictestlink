@@ -63,6 +63,10 @@ if ($data = $form->get_data()) {
         $shadowuser = publictestlink_shadow_user::create(
             $data->email, $data->firstname, $data->lastname
         );
+    } else {
+        $shadowuser->update_names(
+            $data->firstname, $data->lastname
+        );
     }
 
     $session = publictestlink_session::login($shadowuser);
