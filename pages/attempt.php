@@ -26,6 +26,14 @@ $quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
 $context = context_module::instance($cm->id);
 
 $attempt = publictestlink_attempt::from_id($attemptid);
+
+if ($attempt->get_shadow_user()->get_id() !== $session->get_user()->get_id()) {
+    redirect(
+        new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid])
+    );
+    return;
+}
+
 $quba = $attempt->get_quba();
 $quba->set_preferred_behaviour($quiz->preferredbehaviour);
 
