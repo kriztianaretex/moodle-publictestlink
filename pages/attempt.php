@@ -69,12 +69,22 @@ foreach ($quba->get_slots() as $slot) {
     echo $quba->render_question($slot, $displayoptions);
 }
 
-echo html_writer::empty_tag('input', [
+echo html_writer::start_div('attempt-actions');
+
+echo html_writer::tag('button', 'Save answers and don\'t submit', [
     'type'  => 'submit',
     'name'  => 'finishattempt',
-    'value' => 'Submit attempt',
+    'value' => 'false',
+    'class' => 'btn btn-secondary',
+]);
+
+echo html_writer::tag('button', 'Submit answers', [
+    'type'  => 'submit',
+    'name'  => 'finishattempt',
+    'value' => 'true',
     'class' => 'btn btn-primary',
 ]);
 
+echo html_writer::end_div();
 echo html_writer::end_tag('form');
 echo $OUTPUT->footer();

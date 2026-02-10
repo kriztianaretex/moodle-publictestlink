@@ -126,4 +126,16 @@ class publictestlink_attempt {
     public function get_timeend(): ?int {
         return $this->timeend;
     }
+
+    public function mark_submitted() {
+        global $DB;
+        /** @var moodle_database $DB */
+
+        $DB->update_record('local_publictestlink_quizattempt', [
+            'id' => $this->id,
+            'state' => $this->state
+        ]);
+
+        $this->state = self::SUBMITTED;
+    }
 }
