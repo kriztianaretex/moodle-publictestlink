@@ -3,7 +3,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Add public quiz settings to the quiz module form.
- *
+ *  
  * @param moodleform_mod $formwrapper The moodleform_mod instance
  * @param MoodleQuickForm $mform The form instance
  */
@@ -81,15 +81,15 @@ function local_publictestlink_coursemodule_edit_post_actions($data, $course) {
         // Update existing record
         $record->ispublic = $ispublic;
         $DB->update_record('local_publictestlink', $record);
-    } else if ($ispublic == 1) {
-        // Create new record only if ispublic is 1
+    } else {
+        // FIXED: Always create a record if one doesn't exist
+        // This handles BOTH cases: ispublic=1 AND ispublic=0
         $newrecord = (object)[
             'quizid' => $quizid,
-            'ispublic' => 1
+            'ispublic' => $ispublic
         ];
         $DB->insert_record('local_publictestlink', $newrecord);
     }
-    // If ispublic is 0 and no record exists, do nothing
     
     return $data;
 }
