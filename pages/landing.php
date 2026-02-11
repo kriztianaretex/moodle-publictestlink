@@ -58,10 +58,7 @@ $PAGE->add_body_class('landing-body');
 
 function redirect_to_start() {
     global $PLUGIN_URL, $cmid;
-    redirect(
-        new moodle_url($PLUGIN_URL . '/start.php', ['cmid' => $cmid]),
-        'Logged in.'
-    );
+    redirect(new moodle_url($PLUGIN_URL . '/start.php', ['cmid' => $cmid]));
 }
 
 $session = publictestlink_session::check_session();
