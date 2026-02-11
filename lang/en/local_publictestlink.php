@@ -10,3 +10,12 @@ $string['publicquizsettings'] = 'Public Access Settings';
 $string['publicurl'] = 'Public Quiz URL';
 $string['publicurl_desc'] = 'Share this link to allow public access to the quiz';
 $string['publicurl_warning'] = 'Warning: Anyone with this link can access the quiz without logging in. Keep it secure.';
+
+$string['form_email'] = 'Email Address';
+$string['form_firstname'] = 'First Name';
+$string['form_lastname'] = 'Last Name';
+
+$string['accesserror_quiznotopen'] = 'Quiz is not open for attempts yet';
+$string['accesserror_quizclosed'] = 'Quiz is closed';
+$string['accesserror_timelimitexpired'] = 'The time limit has been reached';
+$string['accesserror_maxattempts'] = 'You\'ve reached the maximum attempts for this quiz';
