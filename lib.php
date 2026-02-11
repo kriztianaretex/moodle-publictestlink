@@ -2,26 +2,109 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Add "Make quiz public" below the description editor.
+ * Add public quiz settings to the quiz module form.
+ *  
+ * @param moodleform_mod $formwrapper The moodleform_mod instance
+ * @param MoodleQuickForm $mform The form instance
  */
 function local_publictestlink_coursemodule_standard_elements($formwrapper, $mform) {
-    global $PAGE;
+    global $DB;
     
+    // Get current module info
     $current = $formwrapper->get_current();
-
-    // Only apply to quiz module
-    if (empty($current->modulename) || $current->modulename !== 'quiz') {
+    
+    // Check if we're editing a quiz
+    if (!isset($current->modulename) || $current->modulename !== 'quiz') {
         return;
     }
-
-
-    $publicquiz = $mform->createElement(
-        'advcheckbox',
-        'publicquiz',
-        get_string('makequizpublic', 'local_publictestlink')
-    );
-    $mform->insertElementBefore($publicquiz, 'name');
     
-    $mform->setDefault('publicquiz', 0);
+    $ispublic = 0;
+    
+    if (!empty($current->instance)) {
+        $record = $DB->get_record('local_publictestlink_quizcustom', ['quizid' => $current->instance]);
+        
+        if ($record) {
+            $ispublic = (int)$record->ispublic;
+        }
+        // If no record exists, $ispublic remains 0
+    }
+    
+    // Create form element group
+    $mform->addElement('header', 'publicquizheader', get_string('publicquizsettings', 'local_publictestlink'));
+    $mform->setExpanded('publicquizheader');
+    
+    // Add checkbox
+    $mform->addElement('advcheckbox', 'publicquiz', 
+        get_string('makequizpublic', 'local_publictestlink'),
+        get_string('makequizpublic_desc', 'local_publictestlink'),
+        array('group' => 1),
+        array(0, 1)
+    );
+    
+    $mform->setDefault('publicquiz', $ispublic);
+    $mform->setType('publicquiz', PARAM_INT);
     $mform->addHelpButton('publicquiz', 'makequizpublic', 'local_publictestlink');
+    
+    // Try to move it to a more visible position
+    if ($mform->elementExists('name')) {
+        $mform->insertElementBefore($mform->getElement('publicquizheader'), 'name');
+    }
+}
+
+/**
+ * Process the public quiz setting when quiz form is submitted.
+ *
+ * @param stdClass $data The form data
+ * @param stdClass $course The course
+ * @return stdClass Updated form data
+ */
+function local_publictestlink_coursemodule_edit_post_actions($data, $course) {
+    global $DB;
+    
+    if (!isset($data->modulename) || $data->modulename !== 'quiz' || empty($data->instance)) {
+        return $data;
+    }
+    
+    $quizid = $data->instance;
+    
+    // Get checkbox value
+    $ispublic = optional_param('publicquiz', 0, PARAM_INT);
+    
+    // Also check $data object in case Moodle processed it
+    if (isset($data->publicquiz)) {
+        $ispublic = (int)$data->publicquiz;
+    }
+    
+    $record = $DB->get_record('local_publictestlink_quizcustom', ['quizid' => $quizid]);
+    
+    if ($record) {
+        // Update existing record
+        $record->ispublic = $ispublic;
+        $DB->update_record('local_publictestlink_quizcustom', $record);
+    } else {
+        // FIXED: Always create a record if one doesn't exist
+        // This handles BOTH cases: ispublic=1 AND ispublic=0
+        $newrecord = (object)[
+            'quizid' => $quizid,
+            'ispublic' => $ispublic
+        ];
+        $DB->insert_record('local_publictestlink_quizcustom', $newrecord);
+    }
+    
+    return $data;
+}
+
+/**
+ * Delete public quiz records when a quiz is deleted.
+ *
+ * @param cm_info $cm The course module object
+ */
+function local_publictestlink_pre_course_module_delete($cm) {
+    global $DB;
+    
+    if ($cm->modname !== 'quiz') {
+        return;
+    }
+    
+    $DB->delete_records('local_publictestlink_quizcustom', ['quizid' => $cm->instance]);
 }
