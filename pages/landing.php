@@ -33,7 +33,7 @@ if (!empty($accessprevents)) {
     redirect(
         '/',
         (
-            "You cannot access this quiz yet because:" .
+            "You cannot access this quiz yet because of the following reasons: " .
             $messages
         ),
         null, notification::ERROR

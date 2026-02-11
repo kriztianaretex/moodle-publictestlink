@@ -1,5 +1,6 @@
 <?php
 
+require_once('../locallib.php');
 require_once(__DIR__ . '/attempt.php');
 require_once(__DIR__ . '/shadow_user.php');
 
@@ -28,16 +29,18 @@ class publictestlink_access_manager {
      * @return string[] all reasons why one cannot access the quiz. If it's empty, they can access.
      */
     public function prevent_access(): array {
+        global $MODULE;
+
         $reasons = [];
 
         $quiz = $this->get_quiz();
 
         if ($quiz->timeopen && $this->timenow < $quiz->timeopen) {
-            $reasons[] = get_string('quiznotopen', 'local_publictestlink');
+            $reasons[] = get_string('accesserror_quiznotopen', $MODULE);
         }
 
         if ($quiz->timeclose && $this->timenow > $quiz->timeclose) {
-            $reasons[] = get_string('quizclosed', 'local_publictestlink');
+            $reasons[] = get_string('accesserror_quizclosed', $MODULE);
         }
 
         if ($this->shadowuser) {
@@ -49,15 +52,16 @@ class publictestlink_access_manager {
                 );
 
                 if ($attemptcount >= $attemptsallowed) {
-                    $reasons[] = get_string('maxattempts', 'local_publictestlink');
+                    $reasons[] = get_string('accesserror_maxattempts', $MODULE);
                 }
             }
         }
 
+        // TODO time limit handling
         if ($this->attempt && $quiz->timelimit) {
             $end = $this->attempt->get_timestart() + $quiz->timelimit;
             if ($this->timenow > $end) {
-                $reasons[] = get_string('timelimitexpired', 'local_publictestlink');
+                $reasons[] = get_string('accesserror_timelimitexpired', $MODULE);
             }
         }
 
