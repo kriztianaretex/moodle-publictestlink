@@ -20,6 +20,10 @@ class local_publictestlink_non_user_login extends moodleform {
         $mform->setType('lastname', PARAM_TEXT);
         $mform->addRule('lastname', null, 'required', null, 'client');
 
+        $mform->addElement('hidden', 'cmid');
+        $mform->setType('cmid', PARAM_INT);
+        $mform->setDefault('cmid', $this->_customdata['cmid']);
+
         $this->add_action_buttons(true, get_string('submit'));
     }
 
