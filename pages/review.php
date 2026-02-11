@@ -10,8 +10,6 @@ use core\url as moodle_url;
 use core\notification;
 use core\output\html_writer;
 
-// TODO check if attempt is completed
-
 $cmid = required_param('cmid', PARAM_INT);
 $attemptid = required_param('attemptid', PARAM_INT);
 
@@ -35,6 +33,10 @@ if ($attempt->get_shadow_user()->get_id() !== $session->get_user()->get_id()) {
         new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid])
     );
     return;
+}
+
+if ($attempt->is_in_progress()) {
+    redirect(new moodle_url($PLUGIN_URL . '/attempt.php', ['attemptid' => $attemptid, 'cmid' => $cmid]));
 }
 
 $quba = $attempt->get_quba();
