@@ -13,6 +13,8 @@ use core\notification;
 $cmid = required_param('cmid', PARAM_INT);
 $attemptid = required_param('attemptid', PARAM_INT);
 
+$PAGE->set_cacheable(false);
+
 $session = publictestlink_session::check_session();
 if ($session == null) {
     redirect(

@@ -15,12 +15,14 @@ use core\url as moodle_url;
 // TODO return if quiz is not public
 $cmid = required_param('cmid', PARAM_INT);
 
+$PAGE->set_cacheable(false);
+
 $cm = get_coursemodule_from_id('quiz', $cmid, 0, false, MUST_EXIST);
 $quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
 $quizobj = quiz_settings::create($cm->instance);
 
 $timenow = time();
-$accessmanager = new publictestlink_access_manager($quizobj, null, $timenow);
+$accessmanager = new publictestlink_access_manager($quizobj, $timenow);
 $accessprevents = $accessmanager->prevent_access();
 if (!empty($accessprevents)) {
     $messages = implode(

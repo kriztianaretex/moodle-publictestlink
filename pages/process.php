@@ -11,6 +11,8 @@ $attemptid = required_param('attemptid', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
 $isfinish = optional_param('finishattempt', false, PARAM_BOOL);
 
+$PAGE->set_cacheable(false);
+
 $session = publictestlink_session::check_session();
 if (!$session) {
     redirect(new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid]));

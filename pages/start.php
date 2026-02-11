@@ -15,11 +15,12 @@ require_once('../classes/session.php');
 
 use core\url as moodle_url;
 use core\notification;
-use core\exception\moodle_exception;
 use mod_quiz\quiz_settings;
 
 // Page parameters
 $cmid = required_param('cmid', PARAM_INT);
+
+$PAGE->set_cacheable(false);
 
 $session = publictestlink_session::check_session();
 if ($session == null) {
@@ -62,7 +63,9 @@ if ($attempt !== null) {
     $attempt = publictestlink_attempt::create($quizid, $shadowuserid, $quba);
 }
 
-$accessmanager = new publictestlink_access_manager($quizobj, $attempt, $timenow);
+$timenow = time();
+
+$accessmanager = new publictestlink_access_manager($quizobj, $timenow, $session->get_user(), $attempt);
 $accessprevents = $accessmanager->prevent_access();
 if (!empty($accessprevents)) {
     $messages = implode(
@@ -70,13 +73,16 @@ if (!empty($accessprevents)) {
         array_map(fn($v) => "$v", $accessprevents)
     );
 
+    publictestlink_session::logout();
+
     redirect(
-        '/',
+        new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid]),
         (
             "You cannot access this quiz because of the following reasons:\n" .
             $messages
         ),
-        null, notification::ERROR
+        null,
+        notification::ERROR
     );
 
     return;

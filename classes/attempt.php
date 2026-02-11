@@ -80,6 +80,17 @@ class publictestlink_attempt {
         );
     }
 
+    public static function count_submitted_attempts(int $quizid, int $shadowuserid) {
+        global $DB;
+        /** @var moodle_database $DB */
+
+        return $DB->count_records('local_publictestlink_quizattempt', [
+            'quizid' => $quizid,
+            'shadowuserid' => $shadowuserid,
+            'state' => self::SUBMITTED
+        ]);
+    }
+
     public static function from_id(int $id) {
         global $DB;
         /** @var moodle_database $DB */

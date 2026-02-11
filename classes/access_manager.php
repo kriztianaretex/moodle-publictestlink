@@ -1,14 +1,16 @@
 <?php
 
 require_once(__DIR__ . '/attempt.php');
+require_once(__DIR__ . '/shadow_user.php');
 
 use mod_quiz\quiz_settings;
 
 class publictestlink_access_manager {
     public function __construct(
         protected quiz_settings $quizobj,
-        protected ?publictestlink_attempt $attempt,
-        protected int $timenow
+        protected int $timenow,
+        protected ?publictestlink_shadow_user $shadowuser = null,
+        protected ?publictestlink_attempt $attempt = null,
     ) { }
 
 
@@ -36,6 +38,20 @@ class publictestlink_access_manager {
 
         if ($quiz->timeclose && $this->timenow > $quiz->timeclose) {
             $reasons[] = get_string('quizclosed', 'local_publictestlink');
+        }
+
+        if ($this->shadowuser) {
+            $attemptsallowed = (int)$this->quizobj->get_num_attempts_allowed();
+            if ($attemptsallowed !== 0) {
+                $attemptcount = publictestlink_attempt::count_submitted_attempts(
+                    $quiz->id,
+                    $this->shadowuser->get_id()
+                );
+
+                if ($attemptcount >= $attemptsallowed) {
+                    $reasons[] = get_string('maxattempts', 'local_publictestlink');
+                }
+            }
         }
 
         if ($this->attempt && $quiz->timelimit) {
