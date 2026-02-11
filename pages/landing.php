@@ -4,24 +4,40 @@ require_once('../../../config.php');
 require_once('../locallib.php');
 
 require_once('../classes/session.php');
+require_once('../classes/access_manager.php');
 require_once('../classes/shadow_user.php');
 require_once('../forms/non_user_login.php');
 
-use core\exception\moodle_exception;
+use mod_quiz\quiz_settings;
+use core\notification;
 use core\url as moodle_url;
 
 // TODO return if quiz is not public
 $cmid = required_param('cmid', PARAM_INT);
-echo $cmid;
-$cm = get_coursemodule_from_id(
-    'quiz',
-    $cmid,
-    0,
-    false,
-    IGNORE_MISSING
-);
-if (!$cm) {
-    throw new moodle_exception('invalidcoursemodule');
+
+$cm = get_coursemodule_from_id('quiz', $cmid, 0, false, MUST_EXIST);
+$quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
+$quizobj = quiz_settings::create($cm->instance);
+
+$timenow = time();
+$accessmanager = new publictestlink_access_manager($quizobj, null, $timenow);
+$accessprevents = $accessmanager->prevent_access();
+if (!empty($accessprevents)) {
+    $messages = implode(
+        ", ",
+        array_map(fn($v) => "$v", $accessprevents)
+    );
+
+    redirect(
+        '/',
+        (
+            "You cannot access this quiz yet because:" .
+            $messages
+        ),
+        null, notification::ERROR
+    );
+
+    return;
 }
 
 
@@ -51,6 +67,7 @@ if ($session !== null) {
     redirect_to_start();
     return;
 }
+
 
 $form = new local_publictestlink_non_user_login(
     null,

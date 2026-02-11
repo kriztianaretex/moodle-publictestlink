@@ -36,19 +36,6 @@ $context = context_module::instance($cm->id);
 
 $quizobj = quiz_settings::create($cm->instance);
 
-$timenow = time();
-$accessmanager = new publictestlink_access_manager($quizobj, null, $timenow);
-$accessprevents = $accessmanager->prevent_access();
-if (!empty($accessprevents)) {
-    $output = $PAGE->get_renderer('mod_quiz');
-    throw new moodle_exception(
-        'attempterror',
-        $MODULE,
-        new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid]),
-        $output->access_messages($accessprevents)
-    );
-}
-
 
 $quizid = $quiz->id;
 $shadowuserid = $session->get_user()->get_id();
@@ -78,13 +65,21 @@ if ($attempt !== null) {
 $accessmanager = new publictestlink_access_manager($quizobj, $attempt, $timenow);
 $accessprevents = $accessmanager->prevent_access();
 if (!empty($accessprevents)) {
-    $output = $PAGE->get_renderer('mod_quiz');
-    throw new moodle_exception(
-        'attempterror',
-        $MODULE,
-        new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid]),
-        $output->access_messages($accessprevents)
+    $messages = implode(
+        '\n',
+        array_map(fn($v) => "$v", $accessprevents)
     );
+
+    redirect(
+        '/',
+        (
+            "You cannot access this quiz because of the following reasons:\n" .
+            $messages
+        ),
+        null, notification::ERROR
+    );
+
+    return;
 }
 
 
