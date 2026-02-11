@@ -21,7 +21,7 @@ function local_publictestlink_coursemodule_standard_elements($formwrapper, $mfor
     $ispublic = 0;
     
     if (!empty($current->instance)) {
-        $record = $DB->get_record('local_publictestlink', ['quizid' => $current->instance]);
+        $record = $DB->get_record('local_publictestlink_quizcustom', ['quizid' => $current->instance]);
         
         if ($record) {
             $ispublic = (int)$record->ispublic;
@@ -75,12 +75,12 @@ function local_publictestlink_coursemodule_edit_post_actions($data, $course) {
         $ispublic = (int)$data->publicquiz;
     }
     
-    $record = $DB->get_record('local_publictestlink', ['quizid' => $quizid]);
+    $record = $DB->get_record('local_publictestlink_quizcustom', ['quizid' => $quizid]);
     
     if ($record) {
         // Update existing record
         $record->ispublic = $ispublic;
-        $DB->update_record('local_publictestlink', $record);
+        $DB->update_record('local_publictestlink_quizcustom', $record);
     } else {
         // FIXED: Always create a record if one doesn't exist
         // This handles BOTH cases: ispublic=1 AND ispublic=0
@@ -88,7 +88,7 @@ function local_publictestlink_coursemodule_edit_post_actions($data, $course) {
             'quizid' => $quizid,
             'ispublic' => $ispublic
         ];
-        $DB->insert_record('local_publictestlink', $newrecord);
+        $DB->insert_record('local_publictestlink_quizcustom', $newrecord);
     }
     
     return $data;
@@ -106,5 +106,5 @@ function local_publictestlink_pre_course_module_delete($cm) {
         return;
     }
     
-    $DB->delete_records('local_publictestlink', ['quizid' => $cm->instance]);
+    $DB->delete_records('local_publictestlink_quizcustom', ['quizid' => $cm->instance]);
 }

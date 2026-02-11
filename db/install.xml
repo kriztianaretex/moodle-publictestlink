@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <XMLDB PATH="local/publictestlink/db" VERSION="2024111400" COMMENT="Public Test Link Plugin">
   <TABLES>
-    <TABLE NAME="local_publictestlink" COMMENT="Stores public access information for quizzes">
+    <TABLE NAME="local_publictestlink_quizcustom" COMMENT="Stores public access information for quizzes">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
