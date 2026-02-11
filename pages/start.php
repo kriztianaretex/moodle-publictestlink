@@ -68,7 +68,7 @@ if (!empty($accessprevents)) {
     throw new moodle_exception(
         'attempterror',
         $MODULE,
-        new moodle_url($PLUGIN_URL + '/landing.php', ['cmid' => $cmid]),
+        new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid]),
         $output->access_messages($accessprevents)
     );
 }
