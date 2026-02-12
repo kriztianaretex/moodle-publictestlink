@@ -2,6 +2,7 @@
 
 require_once('../../../config.php');
 require_once($CFG->libdir . '/questionlib.php');
+require_once(__DIR__ . '/shadow_user.php');
 
 
 class publictestlink_attempt {
@@ -124,6 +125,17 @@ class publictestlink_attempt {
 
     public function get_state(): string {
         return $this->state;
+    }
+
+    public function get_state_readable(): string {
+        global $MODULE;
+
+        $map = [
+            self::IN_PROGRESS => get_string('attempt_state_inprogress', $MODULE),
+            self::SUBMITTED => get_string('attempt_state_submitted', $MODULE)
+        ];
+
+        return $map[$this->state];
     }
 
     public function get_timestart(): int {

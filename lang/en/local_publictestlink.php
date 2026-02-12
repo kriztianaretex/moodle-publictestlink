@@ -20,3 +20,11 @@ $string['accesserror_quiznotopen'] = 'Quiz is not open for attempts yet';
 $string['accesserror_quizclosed'] = 'Quiz is closed';
 $string['accesserror_timelimitexpired'] = 'The time limit has been reached';
 $string['accesserror_maxattempts'] = 'You\'ve reached the maximum attempts for this quiz';
+
+$string['attempt_state'] = 'Status';
+$string['respondent'] = 'Respondent';
+$string['started_on'] = 'Started';
+$string['completed_on'] = 'Completed';
+
+$string['attempt_state_inprogress'] = 'In progress';
+$string['attempt_state_submitted'] = 'Submitted';
