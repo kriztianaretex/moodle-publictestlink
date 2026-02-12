@@ -1,8 +1,10 @@
 <?php
 
+use core\exception\moodle_exception;
 use core\output\html_writer;
 use core\url as moodle_url;
 use mod_quiz\quiz_settings;
+use context;
 
 require_once('../../../config.php');
 require_once('../locallib.php');
@@ -18,9 +20,14 @@ $quizid = $attempt->get_quizid();
 $quizobj = quiz_settings::create($quizid);
 $cm = get_coursemodule_from_id('quiz', $quizobj->get_cmid(), 0, false, MUST_EXIST);
 $context = context_module::instance($cm->id);
+if (!$context) throw new moodle_exception('invalidcontext', $MODULE);
 
 $quba = $attempt->get_quba();
 $quba->set_preferred_behaviour($quiz->preferredbehaviour);
+
+require_login($quizobj->get_course(), false, $cm);
+/** @var context $context */
+require_capability('mod/quiz:viewreports', $context);
 
 
 
@@ -72,10 +79,35 @@ echo html_writer::start_div('quizattemptsummary mb-4');
                 html_writer::tag('td', userdate($attempt->get_timestart()), ['class' => 'cell'])
             );
 
-            if ($attempt->get_timeend()) {
+            if (!$attempt->is_in_progress()) {
                 echo html_writer::tag('tr',
                     html_writer::tag('th', get_string('completed_on', $MODULE), ['class' => 'cell']) .
                     html_writer::tag('td', userdate($attempt->get_timeend()), ['class' => 'cell'])
+                );
+
+                echo html_writer::tag('tr',
+                    html_writer::tag('th', get_string('duration', $MODULE), ['class' => 'cell']) .
+                    html_writer::tag('td', format_time($attempt->get_timeend() - $attempt->get_timestart()), ['class' => 'cell'])
+                );
+
+                echo html_writer::tag('tr',
+                    html_writer::tag('th', get_string('marks', $MODULE), ['class' => 'cell']) .
+                    html_writer::tag('td',
+                        format_float($attempt->get_total_mark(), 2) . '/' . format_float($attempt->get_max_mark(), 2),
+                        ['class' => 'cell']
+                    )
+                );
+
+                echo html_writer::tag('tr',
+                    html_writer::tag('th', get_string('grade', $MODULE), ['class' => 'cell']) .
+                    html_writer::tag('td',
+                        get_string('outof', 'quiz', (object)[
+                            'grade'    => html_writer::tag('b', quiz_format_grade($attempt->get_quizobj()->get_quiz(), $attempt->get_scaled_grade())),
+                            'maxgrade' => quiz_format_grade($attempt->get_quizobj()->get_quiz(), $attempt->get_max_grade()),
+                        ]) .
+                        ' (' . html_writer::tag('b', format_float($attempt->get_percentage() * 100, 0)) . '%)',
+                        ['class' => 'cell']
+                    )
                 );
             }
 

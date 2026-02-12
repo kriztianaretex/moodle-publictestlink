@@ -4,6 +4,8 @@ require_once('../../../config.php');
 require_once($CFG->libdir . '/questionlib.php');
 require_once(__DIR__ . '/shadow_user.php');
 
+use mod_quiz\quiz_settings;
+
 
 class publictestlink_attempt {
     public const string IN_PROGRESS = 'inprogress';
@@ -123,6 +125,10 @@ class publictestlink_attempt {
         return $this->quizid;
     }
 
+    public function get_quizobj(): quiz_settings {
+        return quiz_settings::create($this->get_quizid());
+    }
+
     public function get_state(): string {
         return $this->state;
     }
@@ -150,15 +156,47 @@ class publictestlink_attempt {
         global $DB;
         /** @var moodle_database $DB */
 
+        $timenow = time();
+
         $DB->update_record('local_publictestlink_quizattempt', [
             'id' => $this->id,
-            'state' => self::SUBMITTED
+            'state' => self::SUBMITTED,
+            'timeend' => $timenow
         ]);
 
         $this->state = self::SUBMITTED;
+        $this->timeend = $timenow;
     }
 
     public function is_in_progress() {
         return $this->state === self::IN_PROGRESS;
+    }
+
+    public function get_total_mark() {
+        return $this->get_quba()->get_total_mark();
+    }
+
+    public function get_max_mark(): ?float {
+        return $this->get_quizobj()->get_quiz()->sumgrades;
+    }
+
+    public function get_scaled_grade() {
+        return quiz_rescale_grade(
+            $this->get_total_mark(),
+            $this->get_quizobj()->get_quiz(),
+            false
+        );
+    }
+
+    public function get_max_grade() {
+        return $this->get_quizobj()->get_quiz()->grade;
+    }
+
+    public function get_percentage() {
+        return $this->get_scaled_grade() / $this->get_max_grade();
+    }
+
+    public function get_decimalpoints() {
+        return $this->get_quizobj()->get_quiz()->decimalpoints;
     }
 }

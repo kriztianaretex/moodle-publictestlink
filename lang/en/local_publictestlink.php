@@ -25,6 +25,9 @@ $string['attempt_state'] = 'Status';
 $string['respondent'] = 'Respondent';
 $string['started_on'] = 'Started';
 $string['completed_on'] = 'Completed';
+$string['duration'] = 'Duration';
+$string['marks'] = 'Marks';
+$string['grade'] = 'Grade';
 
 $string['attempt_state_inprogress'] = 'In progress';
 $string['attempt_state_submitted'] = 'Submitted';
