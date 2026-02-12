@@ -63,25 +63,9 @@ if ($attempt !== null) {
 $timenow = time();
 
 $accessmanager = new publictestlink_access_manager($quizobj, $timenow, $session->get_user(), $attempt);
-$accessprevents = $accessmanager->prevent_access();
-if (!empty($accessprevents)) {
-    $messages = implode(
-        '\n',
-        array_map(fn($v) => "$v", $accessprevents)
-    );
-
-    publictestlink_session::logout();
-
-    redirect(
-        new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid]),
-        (
-            "You cannot access this quiz because of the following reasons:\n" .
-            $messages
-        ),
-        null,
-        notification::ERROR
-    );
-
+$reasons = $accessmanager->get_formatted_reasons();
+if ($reasons !== null) {
+    redirect('/', $reasons, null, notification::ERROR);
     return;
 }
 

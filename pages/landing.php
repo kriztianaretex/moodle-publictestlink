@@ -23,22 +23,9 @@ $quizobj = quiz_settings::create($cm->instance);
 
 $timenow = time();
 $accessmanager = new publictestlink_access_manager($quizobj, $timenow);
-$accessprevents = $accessmanager->prevent_access();
-if (!empty($accessprevents)) {
-    $messages = implode(
-        ", ",
-        array_map(fn($v) => "$v", $accessprevents)
-    );
-
-    redirect(
-        '/',
-        (
-            "You cannot access this quiz yet because of the following reasons: " .
-            $messages
-        ),
-        null, notification::ERROR
-    );
-
+$reasons = $accessmanager->get_formatted_reasons();
+if ($reasons !== null) {
+    redirect('/', $reasons, null, notification::ERROR);
     return;
 }
 

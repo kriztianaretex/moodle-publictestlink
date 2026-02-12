@@ -5,10 +5,12 @@ require_once('../locallib.php');
 require_once($CFG->libdir . '/questionlib.php');
 require_once('../classes/attempt.php');
 require_once('../classes/session.php');
+require_once('../classes/access_manager.php');
 
 use core\url as moodle_url;
 use core\notification;
 use core\output\html_writer;
+use mod_quiz\quiz_settings;
 
 $cmid = required_param('cmid', PARAM_INT);
 $attemptid = required_param('attemptid', PARAM_INT);
@@ -24,8 +26,17 @@ if ($session == null) {
 $cm = get_coursemodule_from_id('quiz', $cmid, 0, false, MUST_EXIST);
 $quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
 $context = context_module::instance($cm->id);
+$quizobj = quiz_settings::create($cm->instance);
 
 $attempt = publictestlink_attempt::from_id($attemptid);
+
+$timenow = time();
+$accessmanager = new publictestlink_access_manager($quizobj, $timenow, $session->get_user(), $attempt);
+$reasons = $accessmanager->get_formatted_reasons();
+if ($reasons !== null) {
+    redirect('/', $reasons, null, notification::ERROR);
+    return;
+}
 
 if ($attempt->get_shadow_user()->get_id() !== $session->get_user()->get_id()) {
     redirect(
