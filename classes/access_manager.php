@@ -36,7 +36,7 @@ class publictestlink_access_manager {
 
         $quiz = $this->get_quiz();
 
-        $quizcustom = publictestlink_quizcustom::from_quizid((int)$this->quizobj->get_cmid());
+        $quizcustom = publictestlink_quizcustom::from_quizid((int)$this->quizobj->get_quizid());
         if ($quizcustom === null || !$quizcustom->get_ispublic()) {
             $reasons[] = get_string('accesserror_quiznotpublic', $MODULE);
         } else {

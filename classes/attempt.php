@@ -4,6 +4,7 @@ require_once('../../../config.php');
 require_once($CFG->libdir . '/questionlib.php');
 require_once(__DIR__ . '/shadow_user.php');
 
+use core\exception\moodle_exception;
 use mod_quiz\quiz_settings;
 
 
@@ -51,7 +52,7 @@ class publictestlink_attempt {
         );
     }
 
-    public static function get_existing_attempt(int $quizid, int $shadowuserid): ?self {
+    public static function get_existing_attempt(int $quizid, int $shadowuserid, string $state = self::IN_PROGRESS): ?self {
         global $DB;
         /** @var moodle_database $DB */
 
@@ -60,13 +61,13 @@ class publictestlink_attempt {
             FROM {local_publictestlink_quizattempt}
             WHERE quizid = :quizid
                 AND shadowuserid = :shadowuserid
-                AND state = :inprogress
+                AND state = :attemptstate
             ORDER BY timestart DESC
             LIMIT 1",
             [
                 'quizid' => $quizid,
                 'shadowuserid' => $shadowuserid,
-                'inprogress' => self::IN_PROGRESS
+                'attemptstate' => $state
             ]
         );
 
@@ -81,6 +82,13 @@ class publictestlink_attempt {
             $record->timestart,
             $record->timeend
         );
+    }
+
+    public static function require_attempt(int $quizid, int $shadowuserid, string $state = self::IN_PROGRESS): self {
+        $attempt = self::get_existing_attempt($quizid, $shadowuserid, $state);
+        if ($attempt === null) throw new moodle_exception('invalidaccess');
+
+        return $attempt;
     }
 
     public static function count_submitted_attempts(int $quizid, int $shadowuserid) {

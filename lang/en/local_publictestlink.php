@@ -7,9 +7,10 @@ $string['makequizpublic'] = 'Make quiz public';
 $string['makequizpublic_desc'] = 'Allow anyone with the link to access this quiz without logging in';
 
 $string['publicquizsettings'] = 'Public Access Settings';
-$string['publicurl'] = 'Public Quiz URL';
-$string['publicurl_desc'] = 'Share this link to allow public access to the quiz';
-$string['publicurl_warning'] = 'Warning: Anyone with this link can access the quiz without logging in. Keep it secure.';
+$string['public_url'] = 'Public Quiz URL';
+$string['public_url_copy'] = 'Copy Link';
+$string['public_url_desc'] = 'Share this link to allow public access to the quiz';
+$string['public_url_warning'] = 'Warning: Anyone with this link can access the quiz without logging in. Keep it secure.';
 
 $string['form_email'] = 'Email Address';
 $string['form_firstname'] = 'First Name';

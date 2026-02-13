@@ -6,20 +6,21 @@ require_once('../locallib.php');
 require_once('../classes/session.php');
 require_once('../classes/access_manager.php');
 require_once('../classes/shadow_user.php');
+require_once('../classes/link_token.php');
 require_once('../forms/non_user_login.php');
 
 use mod_quiz\quiz_settings;
 use core\notification;
 use core\url as moodle_url;
 
-// TODO return if quiz is not public
-$cmid = required_param('cmid', PARAM_INT);
 
-$PAGE->set_cacheable(false);
+$token = required_param('token', PARAM_ALPHANUMEXT);
 
-$cm = get_coursemodule_from_id('quiz', $cmid, 0, false, MUST_EXIST);
-$quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
-$quizobj = quiz_settings::create($cm->instance);
+$linktoken = publictestlink_link_token::require_token($token);
+
+$quizid = $linktoken->get_quizid();
+$quizobj = quiz_settings::create($quizid);
+$quiz = $quizobj->get_quiz();
 
 $timenow = time();
 $accessmanager = new publictestlink_access_manager($quizobj, $timenow);
@@ -31,9 +32,10 @@ if ($reasons !== null) {
 
 
 $PAGE->requires->css('/local/publictestlink/styles.css');
+$PAGE->set_cacheable(false);
 
 $PAGE->set_url(
-    new moodle_url('/local/publictestlink/pages/landing.php', ['cmid' => $cmid])
+    new moodle_url(PLUGIN_URL . '/landing.php', ['token' => $token])
 );
 
 $PAGE->set_title('Login');
@@ -44,8 +46,8 @@ $PAGE->add_body_class('landing-body');
 
 
 function redirect_to_start() {
-    global $PLUGIN_URL, $cmid;
-    redirect(new moodle_url($PLUGIN_URL . '/start.php', ['cmid' => $cmid]));
+    global $PLUGIN_URL, $token;
+    redirect(new moodle_url($PLUGIN_URL . '/start.php', ['token' => $token]));
 }
 
 $session = publictestlink_session::check_session();
@@ -57,7 +59,7 @@ if ($session !== null) {
 
 $form = new local_publictestlink_non_user_login(
     null,
-    ['cmid' => $cmid]
+    ['token' => $token]
 );
 
 if ($data = $form->get_data()) {

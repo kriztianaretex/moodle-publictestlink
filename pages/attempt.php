@@ -5,29 +5,32 @@ require_once($CFG->libdir . '/questionlib.php');
 require_once('../classes/attempt.php');
 require_once('../classes/session.php');
 require_once('../classes/access_manager.php');
+require_once('../classes/link_token.php');
 
 use core\url as moodle_url;
 use core\output\html_writer;
 use core\notification;
 use mod_quiz\quiz_settings;
 
-$cmid = required_param('cmid', PARAM_INT);
-$attemptid = required_param('attemptid', PARAM_INT);
 
 $PAGE->set_cacheable(false);
 
+$token = required_param('token', PARAM_ALPHANUMEXT);
+
+$linktoken = publictestlink_link_token::require_token($token);
+
 $session = publictestlink_session::check_session();
-if ($session == null) {
-    redirect(new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid]));
+if ($session === null) {
+    redirect(new moodle_url($PLUGIN_URL . '/landing.php', ['token' => $token]));
     return;
 }
 
-$cm = get_coursemodule_from_id('quiz', $cmid, 0, false, MUST_EXIST);
-$quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
-$context = context_module::instance($cm->id);
-$quizobj = quiz_settings::create($cm->instance);
+$quizid = $linktoken->get_quizid();
+$quizobj = quiz_settings::create($quizid);
+$quiz = $quizobj->get_quiz();
 
-$attempt = publictestlink_attempt::from_id($attemptid);
+$shadowuserid = $session->get_user()->get_id();
+$attempt = publictestlink_attempt::require_attempt($quizid, $shadowuserid);
 
 $timenow = time();
 $accessmanager = new publictestlink_access_manager($quizobj, $timenow, $session->get_user(), $attempt);
@@ -42,7 +45,7 @@ if (
     !$attempt->is_in_progress()
 ) {
     redirect(
-        new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid])
+        new moodle_url($PLUGIN_URL . '/landing.php', ['token' => $token])
     );
     return;
 }
@@ -52,7 +55,7 @@ $quba->set_preferred_behaviour($quiz->preferredbehaviour);
 
 $PAGE->requires->css('/local/publictestlink/styles.css');
 $PAGE->add_body_class('landing-body');
-$PAGE->set_url($PLUGIN_URL . '/attempt.php', ['id' => $attemptid]);
+$PAGE->set_url($PLUGIN_URL . '/attempt.php', ['token' => $token]);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_heading($quiz->name);
 
@@ -70,10 +73,7 @@ echo $OUTPUT->header();
 
 echo html_writer::start_tag('form', [
     'method' => 'post',
-    'action' => new moodle_url($PLUGIN_URL . '/process.php', [
-        'attemptid' => $attemptid,
-        'cmid' => $cmid,
-    ]),
+    'action' => new moodle_url($PLUGIN_URL . '/process.php', ['token' => $token]),
 ]);
 
 $questionrenderer = $PAGE->get_renderer('core_question');

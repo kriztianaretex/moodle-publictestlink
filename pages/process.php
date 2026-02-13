@@ -4,29 +4,32 @@ require_once('../locallib.php');
 require_once($CFG->libdir . '/questionlib.php');
 require_once('../classes/attempt.php');
 require_once('../classes/session.php');
+require_once('../classes/link_token.php');
 
 use core\url as moodle_url;
+use mod_quiz\quiz_settings;
 
-$attemptid = required_param('attemptid', PARAM_INT);
-$cmid = required_param('cmid', PARAM_INT);
+$token = required_param('token', PARAM_ALPHANUMEXT);
 $isfinish = optional_param('finishattempt', false, PARAM_BOOL);
+
+$linktoken = publictestlink_link_token::require_token($token);
 
 $PAGE->set_cacheable(false);
 
 $session = publictestlink_session::check_session();
 if (!$session) {
-    redirect(new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid]));
+    redirect(new moodle_url($PLUGIN_URL . '/landing.php', ['token' => $token]));
 }
 
-$cm = get_coursemodule_from_id('quiz', $cmid, 0, false, MUST_EXIST);
-$quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
-$context = context_module::instance($cm->id);
+$quizid = $linktoken->get_quizid();
+$quizobj = quiz_settings::create($quizid);
+$quiz = $quizobj->get_quiz();
 
-$attempt = publictestlink_attempt::from_id($attemptid);
+$attempt = publictestlink_attempt::require_attempt($quizid, $session->get_user()->get_id());
 
 // Shadow-user ownership check
 if ($attempt->get_shadow_user()->get_id() !== $session->get_user()->get_id()) {
-    redirect(new moodle_url($PLUGIN_URL . '/landing.php', ['cmid' => $cmid]));
+    redirect(new moodle_url($PLUGIN_URL . '/landing.php', ['token' => $token]));
 }
 
 $quba = $attempt->get_quba();
@@ -47,20 +50,14 @@ if ($isfinish) {
     $attempt->mark_submitted($timenow);
 
     redirect(
-        new moodle_url($PLUGIN_URL . '/review.php', [
-            'attemptid' => $attemptid,
-            'cmid'      => $cmid,
-        ]),
+        new moodle_url($PLUGIN_URL . '/review.php', ['token' => $token]),
         null,
         1000
     );
 }
 
 redirect(
-    new moodle_url($PLUGIN_URL . '/attempt.php', [
-        'attemptid' => $attemptid,
-        'cmid'      => $cmid,
-    ]),
+    new moodle_url($PLUGIN_URL . '/attempt.php', ['token' => $token]),
     null,
     1000
 );

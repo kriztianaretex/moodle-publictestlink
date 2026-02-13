@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/publictestlink/db" VERSION="20260210" COMMENT="Your plugin tables"
+<XMLDB PATH="local/publictestlink/db" VERSION="20260212" COMMENT="Your plugin tables"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -12,7 +12,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="quizid_fk" TYPE="foreign" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id"/>
+        <KEY NAME="quizid_fk" TYPE="foreign-unique" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="local_publictestlink_shadowuser" COMMENT="All shadow users">
@@ -58,6 +58,18 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="shadowuserid_fk" TYPE="foreign" FIELDS="shadowuserid" REFTABLE="local_publictestlink_shadowuser" REFFIELDS="id"/>
         <KEY NAME="token_uq" TYPE="unique" FIELDS="token"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_publictestlink_linktoken" COMMENT="Contains link tokenizations.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="token" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="Hash of the token."/>
+        <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="quizid_fk" TYPE="foreign-unique" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>
