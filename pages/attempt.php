@@ -89,7 +89,7 @@ $displayoptions->feedback = question_display_options::HIDDEN;
 $displayoptions->generalfeedback = question_display_options::HIDDEN;
 $displayoptions->rightanswer = question_display_options::HIDDEN;
 $displayoptions->readonly = false;
-$displayoptions->flags = question_display_options::VISIBLE;
+$displayoptions->flags = question_display_options::HIDDEN; // TODO add flags
 
 echo $OUTPUT->header();
 
