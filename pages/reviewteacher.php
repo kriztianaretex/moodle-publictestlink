@@ -108,7 +108,7 @@ echo html_writer::div($OUTPUT->render($summary), 'mb-3');
 
 
 foreach ($quba->get_slots() as $slot) {
-    echo $quba->render_question($slot, $displayoptions);
+    echo $quba->render_question($slot, $displayoptions, $slot);
 }
 
 

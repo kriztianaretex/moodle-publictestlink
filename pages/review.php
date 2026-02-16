@@ -83,7 +83,7 @@ $PAGE->set_heading($course->fullname);
 user_header_writer::write($session);
 
 foreach ($quba->get_slots() as $slot) {
-    echo $quba->render_question($slot, $displayoptions);
+    echo $quba->render_question($slot, $displayoptions, $slot);
 }
 
 echo html_writer::start_div('d-flex flex-row w-100 justify-content-end');
