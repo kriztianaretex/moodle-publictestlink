@@ -38,7 +38,7 @@ function local_publictestlink_coursemodule_standard_elements($formwrapper, $mfor
 
 
     $mform->insertElementBefore(
-        $mform->addElement('header', 'publicquizheader', get_string('publicquizsettings', 'local_publictestlink')),
+        $mform->createElement('header', 'publicquizheader', get_string('publicquizsettings', 'local_publictestlink')),
         'timing'
     );
     $mform->setExpanded('publicquizheader', false);
