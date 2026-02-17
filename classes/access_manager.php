@@ -7,6 +7,9 @@ require_once(__DIR__ . '/quizcustom.php');
 
 use mod_quiz\quiz_settings;
 
+/**
+ * Manages access for various parts of the quiz flow.
+ */
 class publictestlink_access_manager {
     public function __construct(
         protected quiz_settings $quizobj,
@@ -16,11 +19,18 @@ class publictestlink_access_manager {
     ) { }
 
 
+    /**
+     * Gets the quiz from the quiz object.
+     * 
+     * @return stdClass The quiz object
+     */
     private function get_quiz(): stdClass {
         return $this->quizobj->get_quiz();
     }
 
-    // Checks if the public can access the quiz.
+    /**
+     * Checks if people can start an attempt.
+     */
     public function can_start_attempt(): bool {
         return empty($this->prevent_access());
     }
@@ -36,14 +46,17 @@ class publictestlink_access_manager {
 
         $quiz = $this->get_quiz();
 
-        $quizcustom = publictestlink_quizcustom::from_quizid((int)$this->quizobj->get_cmid());
+        // Is the quiz public?
+        $quizcustom = publictestlink_quizcustom::from_quizid((int)$this->quizobj->get_quizid());
         if ($quizcustom === null || !$quizcustom->get_ispublic()) {
             $reasons[] = get_string('accesserror_quiznotpublic', $MODULE);
         } else {
+            // Is the quiz open now?
             if ($quiz->timeopen && $this->timenow < $quiz->timeopen) {
                 $reasons[] = get_string('accesserror_quiznotopen', $MODULE);
             }
     
+            // Is the quiz closed now?
             if ($quiz->timeclose && $this->timenow > $quiz->timeclose) {
                 $reasons[] = get_string('accesserror_quizclosed', $MODULE);
             }
@@ -56,17 +69,10 @@ class publictestlink_access_manager {
                         $this->shadowuser->get_id()
                     );
     
+                    // Has the user exceeded the number of attempts?
                     if ($attemptcount >= $attemptsallowed) {
                         $reasons[] = get_string('accesserror_maxattempts', $MODULE);
                     }
-                }
-            }
-    
-            // TODO time limit handling
-            if ($this->attempt && $quiz->timelimit) {
-                $end = $this->attempt->get_timestart() + $quiz->timelimit;
-                if ($this->timenow > $end) {
-                    $reasons[] = get_string('accesserror_timelimitexpired', $MODULE);
                 }
             }
         }
@@ -74,6 +80,10 @@ class publictestlink_access_manager {
         return $reasons;
     }
 
+    /**
+     * Gets the reasons for why one cannot access the quiz.
+     * @return ?string The formatted reasons, or `null` when there is no problem with accessing the quiz.
+     */
     public function get_formatted_reasons(): ?string {
         $accessprevents = $this->prevent_access();
         if (empty($accessprevents)) return null;

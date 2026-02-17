@@ -1,9 +1,12 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 
-require_once('../locallib.php');
+require_once(__DIR__ . '/../locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * The form for logging in as a non-user.
+ */
 class local_publictestlink_non_user_login extends moodleform {
 
     public function definition() {
@@ -23,9 +26,9 @@ class local_publictestlink_non_user_login extends moodleform {
         $mform->setType('lastname', PARAM_TEXT);
         $mform->addRule('lastname', null, 'required', null, 'client');
 
-        $mform->addElement('hidden', 'cmid');
-        $mform->setType('cmid', PARAM_INT);
-        $mform->setDefault('cmid', $this->_customdata['cmid']);
+        $mform->addElement('hidden', 'token');
+        $mform->setType('token', PARAM_INT);
+        $mform->setDefault('token', $this->_customdata['token']);
 
         $this->add_action_buttons(true, get_string('submit'));
     }
